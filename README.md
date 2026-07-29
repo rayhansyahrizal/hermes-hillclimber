@@ -29,6 +29,24 @@ Live runs are hard-capped at eight one-turn calls. The current adapter pins `ope
 
 Each run writes an auditable JSON record under `runs/<timestamp>/run.json`.
 
+## Experiment 02 (preregistered)
+
+The frozen harness is separate from the original demo. It deliberately exposes
+no live-run command. Prepare deterministic materials and run the zero-cost
+90-call protocol rehearsal with:
+
+```bash
+python3 -m hillclimber.experiment02_cli prepare --root experiment-02
+python3 -m hillclimber.experiment02_cli dry-run experiment-02/experiment-02-manifest.json \
+  --output runs/experiment-02-dry-run.jsonl
+python3 -m hillclimber.experiment02_analysis <immutable-live-ledger.jsonl>
+```
+
+Solver routes are stored only in the ignored, mode-0600
+`experiment-02/private/experiment-02-solver-manifest.json`; the public manifest
+contains route commitments (SHA-256) only. Do not unseal it until all live raw
+responses have been committed.
+
 ## First live result
 
 The baseline scored `24`. The model found a `148`-point route on its first attempt, collecting all four treasures and reaching the exit in 22 steps. Three identical optimal attempts were rejected, then the stagnation guard stopped the run after four calls.

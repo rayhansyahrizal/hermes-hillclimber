@@ -1,0 +1,230 @@
+{
+  "protocol": "experiment-02",
+  "model": "openai-codex/gpt-5.6-sol",
+  "map_seed": "hermes-hillclimber-exp02-maps-v1",
+  "preregistration_sha256": "37941833ec248aafe2e39aa56627590fa69930a8712ad877ed5b7c4e1e71dcf2",
+  "generation": {
+    "seed": "hermes-hillclimber-exp02-maps-v1",
+    "attempts": 8500,
+    "accepted": 10,
+    "rejection_counts": {
+      "junctions": 8377,
+      "non_unique_optimum": 113,
+      "optimum_length": 51
+    }
+  },
+  "maps": [
+    {
+      "map_id": "0c6ee673e8b4",
+      "sha256": "0c6ee673e8b4955655e18d4ea065e3eee59fd691ef971bce9a007f72cf349d5d",
+      "path": "maps/0c6ee673e8b4.txt",
+      "route_sha256": "df2163eff87ec29b4b194d3b1e04257f141cf1d39b17a54aab2942acffd4cc5b"
+    },
+    {
+      "map_id": "15faed692904",
+      "sha256": "15faed692904bd2a86345d642adfd98fd5788458694153d13346d291206b0189",
+      "path": "maps/15faed692904.txt",
+      "route_sha256": "24096639ac77365cc3a9c28ae2825f29ea3068041cfd07dd1bfc55736c142b35"
+    },
+    {
+      "map_id": "26182b9c4d5c",
+      "sha256": "26182b9c4d5c2fa331bd25da1e36c247eecd037d8ebfdf2ed21ac5ed18bc7b75",
+      "path": "maps/26182b9c4d5c.txt",
+      "route_sha256": "c2d8c9bfceca07df64f7223251533a394215b1a24ddc6f2338bee62d02085fe1"
+    },
+    {
+      "map_id": "4c1d29f1cb86",
+      "sha256": "4c1d29f1cb86b1e3026299926e537c242764773c03933ff36e946fa9c1e118eb",
+      "path": "maps/4c1d29f1cb86.txt",
+      "route_sha256": "0d0869a89cccccc00c47d7bcac7ab1a80bfb1fd37bda5070dffe80ef8b0ff672"
+    },
+    {
+      "map_id": "530cc81071d7",
+      "sha256": "530cc81071d78cf3eb849196993189cec4c83843cb5d07c36ae9c98b23bb892a",
+      "path": "maps/530cc81071d7.txt",
+      "route_sha256": "e93de6e941d8a8c5fefe1930c724c354244953bf8f5a85ef647d623d6df127c6"
+    },
+    {
+      "map_id": "87b36846546f",
+      "sha256": "87b36846546f4b2f90974f4f772e5eef9ea912564ce939f6a7cc045d6071d0ff",
+      "path": "maps/87b36846546f.txt",
+      "route_sha256": "2236b2dc1a042e5268ce0eb8ff61abcc9376cbb5651828ed85d27b2c4067d1c1"
+    },
+    {
+      "map_id": "dd4650483ad9",
+      "sha256": "dd4650483ad9398bf8d0a9668c92633ac33a12d42cede7c60e8ebf6398567fab",
+      "path": "maps/dd4650483ad9.txt",
+      "route_sha256": "01c57cfcbec49a7b2d627c9d6c6973a09f3e35eb1887fd05e9dd697c7f90106a"
+    },
+    {
+      "map_id": "e01b98c3b35d",
+      "sha256": "e01b98c3b35d506e07cb5e4fed29760ea2d534db417bcb7bcfd15010e4c6447a",
+      "path": "maps/e01b98c3b35d.txt",
+      "route_sha256": "1866997b307917676e13bc9a9111e5bcde7b74ec57b70477ec76de69b643c6aa"
+    },
+    {
+      "map_id": "f2e8fad25ea4",
+      "sha256": "f2e8fad25ea4fc01369f12a7f781c90fe154206b6b423bcaddd669b1a0545c95",
+      "path": "maps/f2e8fad25ea4.txt",
+      "route_sha256": "721d68e4d280c9629dd9b8d20350055224543838bedc5bbd53b104530cc3f073"
+    },
+    {
+      "map_id": "f82b554d2650",
+      "sha256": "f82b554d26504c4c05f9c793ae587d025d5d0fde759d1fe4ef7f2cdff817a7ea",
+      "path": "maps/f82b554d2650.txt",
+      "route_sha256": "459a0333b32b3ff116d5d7fdcddeccb4176a3a861af7d0a3f842f352854d4b08"
+    }
+  ],
+  "schedule": [
+    {
+      "block": 1,
+      "map_id": "87b36846546f",
+      "condition": "A"
+    },
+    {
+      "block": 2,
+      "map_id": "4c1d29f1cb86",
+      "condition": "A"
+    },
+    {
+      "block": 3,
+      "map_id": "dd4650483ad9",
+      "condition": "A"
+    },
+    {
+      "block": 4,
+      "map_id": "530cc81071d7",
+      "condition": "B"
+    },
+    {
+      "block": 5,
+      "map_id": "e01b98c3b35d",
+      "condition": "B"
+    },
+    {
+      "block": 6,
+      "map_id": "26182b9c4d5c",
+      "condition": "C"
+    },
+    {
+      "block": 7,
+      "map_id": "15faed692904",
+      "condition": "B"
+    },
+    {
+      "block": 8,
+      "map_id": "f2e8fad25ea4",
+      "condition": "C"
+    },
+    {
+      "block": 9,
+      "map_id": "f82b554d2650",
+      "condition": "C"
+    },
+    {
+      "block": 10,
+      "map_id": "0c6ee673e8b4",
+      "condition": "A"
+    },
+    {
+      "block": 11,
+      "map_id": "f2e8fad25ea4",
+      "condition": "A"
+    },
+    {
+      "block": 12,
+      "map_id": "530cc81071d7",
+      "condition": "C"
+    },
+    {
+      "block": 13,
+      "map_id": "f82b554d2650",
+      "condition": "A"
+    },
+    {
+      "block": 14,
+      "map_id": "e01b98c3b35d",
+      "condition": "C"
+    },
+    {
+      "block": 15,
+      "map_id": "15faed692904",
+      "condition": "C"
+    },
+    {
+      "block": 16,
+      "map_id": "87b36846546f",
+      "condition": "B"
+    },
+    {
+      "block": 17,
+      "map_id": "0c6ee673e8b4",
+      "condition": "B"
+    },
+    {
+      "block": 18,
+      "map_id": "4c1d29f1cb86",
+      "condition": "B"
+    },
+    {
+      "block": 19,
+      "map_id": "dd4650483ad9",
+      "condition": "B"
+    },
+    {
+      "block": 20,
+      "map_id": "26182b9c4d5c",
+      "condition": "A"
+    },
+    {
+      "block": 21,
+      "map_id": "87b36846546f",
+      "condition": "C"
+    },
+    {
+      "block": 22,
+      "map_id": "26182b9c4d5c",
+      "condition": "B"
+    },
+    {
+      "block": 23,
+      "map_id": "15faed692904",
+      "condition": "A"
+    },
+    {
+      "block": 24,
+      "map_id": "f2e8fad25ea4",
+      "condition": "B"
+    },
+    {
+      "block": 25,
+      "map_id": "dd4650483ad9",
+      "condition": "C"
+    },
+    {
+      "block": 26,
+      "map_id": "4c1d29f1cb86",
+      "condition": "C"
+    },
+    {
+      "block": 27,
+      "map_id": "f82b554d2650",
+      "condition": "B"
+    },
+    {
+      "block": 28,
+      "map_id": "530cc81071d7",
+      "condition": "A"
+    },
+    {
+      "block": 29,
+      "map_id": "0c6ee673e8b4",
+      "condition": "C"
+    },
+    {
+      "block": 30,
+      "map_id": "e01b98c3b35d",
+      "condition": "A"
+    }
+  ]
+}
