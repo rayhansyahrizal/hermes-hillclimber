@@ -1,0 +1,10 @@
+{
+  "zero_cost": true,
+  "live_calls": 0,
+  "full_rehearsal_events": 181,
+  "full_rehearsal_sha256": "9cb6e9854af0cdc29750c66aab656024e34537e0b1830af7fd9d62bfadbc250d",
+  "crash_reservation_survived": true,
+  "crashed_key_never_redispatched": true,
+  "crashed_attempt_result": "ambiguous_transport",
+  "crash_ledger_sha256": "63f17ce6567ed44b80c7a9804da7e8101bf16de7e8ffc52f37660826118d70ac"
+}

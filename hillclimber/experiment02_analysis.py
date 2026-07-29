@@ -21,7 +21,8 @@ def _total(rows, field):
     return None if any(v is None for v in values) else sum(values)
 
 def analyze(records, bootstrap_samples=100000, *, manifest=None, solver_optima=None):
-    if any(r.get("protocol_abort") for r in records): raise ValueError("aborted protocol is not confirmatory")
+    if any(r.get("event")=="protocol_abort" for r in records): raise ValueError("aborted protocol is not confirmatory")
+    records=[r for r in records if r.get("event")=="attempt_result"]
     by={}
     for r in records:
         key=(r.get("map_id"),r.get("condition")); by.setdefault(key,[]).append(r)
@@ -55,11 +56,12 @@ def analyze(records, bootstrap_samples=100000, *, manifest=None, solver_optima=N
         conditions[c]={"calls_attempted":len(calls),"calls_completed":sum(r.get("status") not in ("transport_failure",) for r in calls),**{f"{f}_total":_total(calls,f) for f in TOKEN_FIELDS},"cost_total":_total(calls,"cost"),"success_rate":sum(bool(row[c]["success"]) for row in rows)/10,"validity_rate":sum(row[c]["validity_rate"] for row in rows)/10,"collision_rate":sum(row[c]["collision_rate"] for row in rows)/10,"mean_gain_from_call_1":statistics.mean(row[c]["gain_from_call_1"] for row in rows)}
     token_delta=None if conditions["B"]["total_tokens_total"] is None or conditions["C"]["total_tokens_total"] is None else conditions["C"]["total_tokens_total"]-conditions["B"]["total_tokens_total"]
     per_1000=None if not conditions["C"]["total_tokens_total"] else observed/(conditions["C"]["total_tokens_total"]/1000)
-    return {"confirmatory_eligible":True,"rows":rows,"C_minus_B":{"differences":diffs,"mean":observed,"median":statistics.median(diffs),"positive":sum(d>0 for d in diffs),"tied":sum(d==0 for d in diffs),"negative":sum(d<0 for d in diffs),"exact_one_sided_p":p,"bootstrap_95_percentile":[boot[lo],boot[hi]],"score_per_1000_C_tokens":per_1000},"contrasts":{"C-A_mean":statistics.mean(r["C-A"] for r in rows),"B-A_mean":statistics.mean(r["B-A"] for r in rows),"C-B_success":conditions["C"]["success_rate"]-conditions["B"]["success_rate"],"C-B_validity":conditions["C"]["validity_rate"]-conditions["B"]["validity_rate"],"C-B_tokens":token_delta,"C-B_cost":None if conditions["C"]["cost_total"] is None or conditions["B"]["cost_total"] is None else conditions["C"]["cost_total"]-conditions["B"]["cost_total"]},"conditions":conditions,"bootstrap":{"samples":bootstrap_samples,"seed":BOOTSTRAP_SEED,"percentile_convention":"sorted nearest-rank floor at 2.5% and 97.5%; zero-based indices floor(p*N)-1 clamped"}}
+    return {"confirmatory_eligible":True,"rows":rows,"C_minus_B":{"differences":diffs,"mean":observed,"median":statistics.median(diffs),"positive":sum(d>0 for d in diffs),"tied":sum(d==0 for d in diffs),"negative":sum(d<0 for d in diffs),"exact_one_sided_p":p,"bootstrap_95_percentile":[boot[lo],boot[hi]],"score_per_1000_C_tokens":per_1000,"call1_to_best_gain_mean":conditions["C"]["mean_gain_from_call_1"]-conditions["B"]["mean_gain_from_call_1"]},"contrasts":{"C-A_mean":statistics.mean(r["C-A"] for r in rows),"B-A_mean":statistics.mean(r["B-A"] for r in rows),"C-B_success":conditions["C"]["success_rate"]-conditions["B"]["success_rate"],"C-A_success":conditions["C"]["success_rate"]-conditions["A"]["success_rate"],"B-A_success":conditions["B"]["success_rate"]-conditions["A"]["success_rate"],"C-B_validity":conditions["C"]["validity_rate"]-conditions["B"]["validity_rate"],"C-B_tokens":token_delta,"C-B_cost":None if conditions["C"]["cost_total"] is None or conditions["B"]["cost_total"] is None else conditions["C"]["cost_total"]-conditions["B"]["cost_total"]},"conditions":conditions,"bootstrap":{"samples":bootstrap_samples,"seed":BOOTSTRAP_SEED,"percentile_convention":"sorted nearest-rank floor at 2.5% and 97.5%; zero-based indices floor(p*N)-1 clamped"}}
 
 def main(argv=None):
     p=argparse.ArgumentParser(); p.add_argument("ledger",type=Path); p.add_argument("--manifest",type=Path); p.add_argument("--output",type=Path); args=p.parse_args(argv)
-    records=[json.loads(line) for line in args.ledger.read_text().splitlines() if line]; manifest=json.loads(args.manifest.read_text()) if args.manifest else None
+    from hillclimber.experiment02_runtime import verify_finalized
+    records=verify_finalized(args.ledger); manifest=json.loads(args.manifest.read_text()) if args.manifest else None
     result=analyze(records,manifest=manifest); text=json.dumps(result,indent=2)+"\n"
     if args.output: args.output.write_text(text)
     else: print(text,end="")

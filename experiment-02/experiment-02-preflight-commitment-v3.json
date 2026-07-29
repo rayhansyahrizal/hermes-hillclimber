@@ -1,0 +1,28 @@
+{
+  "protocol": "experiment-02-v3-execution-integrity",
+  "manifest_path": "experiment-02/experiment-02-manifest-v2.json",
+  "manifest_sha256": "3ca788917d3f9e8ae56afdf7a379bd6fc4b626d52267022f16b642e85bc22cf5",
+  "preregistration_path": "experiment-02-preregistration.md",
+  "preregistration_sha256": "37941833ec248aafe2e39aa56627590fa69930a8712ad877ed5b7c4e1e71dcf2",
+  "amendment_path": "experiment-02-protocol-amendment-v2-2026-07-29.md",
+  "amendment_sha256": "7f990eeeb8d808381b695aa68c1451c881b88ff394b452bd3754bb48f760a145",
+  "base_prompt_sha256": "3093ca085ad782e1f5a8a8b9e6075961d20acec83a9bca4760d723cdadef4def",
+  "feedback_template_sha256": "5cf0401d2c1f0b42a1d3b4321e085e010a47a1211a090e43e49ca14314f92801",
+  "full_prompt_map_sha256": "86f876411dd05166f0bc845f94dbe9a715358037cfc42c5868799e9ce0550157",
+  "caps": {
+    "calls": 90,
+    "per_block": {
+      "A": 1,
+      "B": 4,
+      "C": 4
+    },
+    "input_tokens": 900000,
+    "output_tokens": 90000,
+    "total_tokens": 990000,
+    "currency_usd": 10.0,
+    "max_reserved_usd_per_call": 0.11
+  },
+  "custody_request_path": "experiment-02/compass-custody-acknowledgment-request-v3.json",
+  "custody_request_sha256": "405c94aeb4deff1a39e4e7fcb0c395bae990eb26f3a5ebf44fdbb252bc956e79",
+  "source_binding_path": "experiment-02/compass-audited-source-binding-v3.json"
+}
