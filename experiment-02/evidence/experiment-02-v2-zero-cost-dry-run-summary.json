@@ -1,0 +1,17 @@
+{
+  "adapter": "scripted-local-zero-cost (injected test seam; no Hermes/provider invocation)",
+  "live_model_calls": 0,
+  "interrupted_after_attempts": 37,
+  "partial_file_sha256": "1555724f72796ec927047b90df85098d1022e518d5d6883aa065dc0db8057d56",
+  "resumed_attempts": 90,
+  "factory_instances": 90,
+  "calls_by_condition": {
+    "A": 10,
+    "B": 40,
+    "C": 40
+  },
+  "total_cost": 0.0,
+  "final_entry_sha256": "278380efacd5efa55164aac33b46cffcc077a02517456ce22fab86a280e56944",
+  "ledger_sha256": "42d983c8dbfc594331dbac4f0295d3e02cb4910e131d3bcd96ef4fa96e9c85d3",
+  "chain_verified": true
+}

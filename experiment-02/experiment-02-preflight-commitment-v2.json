@@ -1,0 +1,42 @@
+{
+  "protocol": "experiment-02-v2",
+  "sealed_at": "2026-07-29T00:00:00Z",
+  "repository_baseline_commit": "9f310172ec31ffb0437ddbfc106930377dc434ba",
+  "manifest_path": "experiment-02-manifest-v2.json",
+  "manifest_sha256": "3ca788917d3f9e8ae56afdf7a379bd6fc4b626d52267022f16b642e85bc22cf5",
+  "preregistration_sha256": "37941833ec248aafe2e39aa56627590fa69930a8712ad877ed5b7c4e1e71dcf2",
+  "amendment_sha256": "7f990eeeb8d808381b695aa68c1451c881b88ff394b452bd3754bb48f760a145",
+  "base_prompt_sha256": "3093ca085ad782e1f5a8a8b9e6075961d20acec83a9bca4760d723cdadef4def",
+  "feedback_template_sha256": "ee9348928f80cd1e12dd52ba654b844fc66cddf1777c6d2c18cff6ea7a051d09",
+  "adapter": {
+    "provider": "openai-codex",
+    "model": "gpt-5.6-sol",
+    "hermes_version": "0.17.0+upstream.fcdefb41",
+    "config_sha256": "81b43538ef42cff58ebf8af0918a7ef8b6264a655d85e734227ef3648bd55a63",
+    "invocation": [
+      "hermes",
+      "chat",
+      "--quiet",
+      "--ignore-rules",
+      "--max-turns",
+      "1",
+      "--source",
+      "tool",
+      "--provider",
+      "openai-codex",
+      "--model",
+      "gpt-5.6-sol"
+    ],
+    "fresh_one_turn": true,
+    "tools_enabled": false,
+    "personal_rules": false
+  },
+  "adapter_defaults": "temperature/sampling omitted: pinned Hermes adapter default",
+  "currency_cap": 10.0,
+  "global_call_cap": 90,
+  "per_block_caps": {
+    "A": 1,
+    "B": 4,
+    "C": 4
+  }
+}

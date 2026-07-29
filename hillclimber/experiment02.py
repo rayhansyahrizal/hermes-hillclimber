@@ -125,15 +125,24 @@ def generate_maps(count: int=10, seed: str=MAP_SEED, max_attempts: int=200000):
 
 
 def frozen_schedule(map_ids: Iterable[str], seed: str=SCHEDULE_SEED) -> list[dict[str,Any]]:
-    ids=sorted(map_ids); rng=_rng(seed); rng.shuffle(ids); rotations=("ABC","BCA","CAB")
-    assigned={mid:rotations[i%3] for i,mid in enumerate(ids)}
-    schedule=[]
-    for wave in range(3):
-        wave_ids=ids[:]; rng.shuffle(wave_ids)
-        if schedule and wave_ids[0] == schedule[-1]["map_id"]:
-            wave_ids[0],wave_ids[1]=wave_ids[1],wave_ids[0]
-        for mid in wave_ids: schedule.append({"block":len(schedule)+1,"map_id":mid,"condition":assigned[mid][wave]})
-    return schedule
+    """v2 schedule: literal successive triples ABC/BCA/CAB, with exact map allocation."""
+    ids=sorted(map_ids)
+    if len(ids)!=10 or len(set(ids))!=10: raise ValueError("schedule requires 10 unique maps")
+    conditions="".join(("ABC","BCA","CAB")[i%3] for i in range(10))
+    # Deterministic rejection sampling assigns each condition's ten map slots.
+    rng=_rng(seed)
+    for _ in range(100000):
+        pools={c:ids[:] for c in "ABC"}
+        for pool in pools.values(): rng.shuffle(pool)
+        schedule=[]
+        for condition in conditions:
+            choices=[m for m in pools[condition] if not schedule or m!=schedule[-1]["map_id"]]
+            if not choices: break
+            mid=choices[0]; pools[condition].remove(mid)
+            schedule.append({"block":len(schedule)+1,"map_id":mid,"condition":condition})
+        if len(schedule)==30:
+            return schedule
+    raise RuntimeError("unable to construct counterbalanced schedule")
 
 
 def prepare_materials(root: Path, preregistration: Path) -> tuple[Path,Path]:

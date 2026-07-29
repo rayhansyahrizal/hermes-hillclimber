@@ -31,9 +31,11 @@ Each run writes an auditable JSON record under `runs/<timestamp>/run.json`.
 
 ## Experiment 02 (preregistered)
 
-The frozen harness is separate from the original demo. It deliberately exposes
-no live-run command. Prepare deterministic materials and run the zero-cost
-90-call protocol rehearsal with:
+The frozen harness is separate from the original demo. It deliberately exposes no live-run command.
+
+After Compass rejected v1, `experiment-02-protocol-amendment-v2-2026-07-29.md` was committed before any schedule correction. The rejected manifest remains at its original path; corrected preflight materials use explicit `-v2` names. `hillclimber.experiment02_runtime.Orchestrator` is a dedicated resumable protocol seam, but it fails closed unless explicitly enabled and is **not an authorization or public live command**. Only the injected scripted adapter has been exercised. See the committed hash-chained rehearsal and summary under `experiment-02/evidence/`.
+
+The legacy CLI can still prepare materials and run a zero-cost rehearsal; it does not expose the v2 live orchestrator:
 
 ```bash
 python3 -m hillclimber.experiment02_cli prepare --root experiment-02

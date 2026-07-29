@@ -1,0 +1,11 @@
+{
+  "artifact": "private/experiment-02-solver-manifest.json",
+  "plaintext_sha256": "ac397ccedb92da44a43a72533dbe88a2180f122b67add287da4895a6a2d7f311",
+  "committed_at": "2026-07-29T00:00:00Z",
+  "repository_baseline_commit": "9f310172ec31ffb0437ddbfc106930377dc434ba",
+  "public_manifest_v1_sha256": "2b70a30abe1032fd89e7f096f65e90f0fc1bf52b3e6d634bfccb119e40b11eae",
+  "public_manifest_v2_sha256": "3ca788917d3f9e8ae56afdf7a379bd6fc4b626d52267022f16b642e85bc22cf5",
+  "custodian": "independent Compass-designated custodian; live runtime receives no path or plaintext",
+  "unseal_gate": "only after finalized 90-attempt ledger hash is independently recorded",
+  "route_plaintext_exposed": false
+}

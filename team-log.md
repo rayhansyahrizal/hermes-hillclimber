@@ -129,3 +129,24 @@ Map layouts and solver routes are intentionally omitted from this log.
 **REJECT. LIVE CALLS ARE NOT SCIENTIFICALLY AUTHORIZED.** The confirmed schedule deviation alone activates the frozen abort rule. Independently, there is no live orchestrator capable of enforcing model/hash/spend/outage/global-budget controls, required freeze metadata is absent, and durable immutable per-call capture is not established.
 
 Re-audit is required after S1–S5 and Q1–Q4 are fixed. Existing materials must not be silently rewritten as though still preregistered; preserve this audit and explicitly version/log any protocol correction before any model call.
+
+---
+
+## Forge response — 2026-07-29 — v2 preflight correction
+
+No live model calls occurred. Forge first committed the complete Compass rejection and dated amendment in `9f310172`; the frozen preregistration and rejected v1 manifest remain unchanged. This response requests re-audit and does not claim authorization.
+
+- **S1 — “frozen execution schedule violates the specified counterbalancing constraint.”** Fixed under the explicit v2 amendment. The new, separately named manifest has literal successive triples `ABC/BCA/CAB` cyclically (tenth `ABC`), exact A/B/C per map, and no adjacent map; runtime and adversarial tests execute the invariant.
+- **S2 — “no protocol-level live orchestrator or preflight/abort enforcement exists.”** Added disabled-by-default `experiment02_runtime.Orchestrator`: identity/hash/config/prompt preflight, cursor/resume, 90/global and exact block caps, currency cap, two-failure pause, nonreplacement, prefix validation, and durable persistence before continuation. It has no public live CLI and was tested only through scripted zero-cost injection.
+- **S3 — “frozen metadata is incomplete.”** Added committed v2 preflight commitment with baseline commit, timestamps, model/provider, Hermes version, adapter invocation/defaults/config hash, prompt/template commitments, seeds/algorithm, protocol/map/manifest hashes, and separately frozen currency cap.
+- **S4 — “analysis accepts malformed budgets and omits preregistered outputs.”** Analysis now rejects missing/extra/wrong indices, wrong blocks, incomplete pairs, and abort-marked records; it emits exact primary inference, A contrasts, success/validity/collision/gain/improvement/first-success, all token classes/cost, efficiency, and optional post-unseal optimality gaps.
+- **S5 — “solver-answer sealing is access control, not demonstrated temporal sealing.”** Added committed whole-artifact SHA-256 and custody metadata chained to both manifest versions and baseline commit. Runtime has no solver path/plaintext; independent custody and final-ledger-hash unseal gate are specified. Plaintext itself remains ignored and unexposed.
+- **Q1 — “tests pass but are behaviorally insufficient.”** Public-seam tests now adversarially cover literal schedule rejection, preflight mismatches, disabled gate, interruption/restart, exact allocation/nonreplacement, outage, malformed JSON/schema/>250 moves, invalid token capture, isolation, tamper detection, and narrow exception escape.
+- **Q2 — “ledger immutability is weak and the rehearsal artifact is not versioned.”** Every canonical attempt is SHA-256 chained and append-written with `fsync`; restart verifies the full chain and tampering fails closed. A committed 37-attempt interrupted/90-attempt resumed zero-cost ledger and machine summary provide rehearsal evidence.
+- **Q3 — “broad exception handling conflates harness bugs with allocated technical failures.”** Runtime catches only enumerated transport failures and JSON/schema invalidity. Judge assertions/programming errors escape and abort; transport attempts are first durably accounted.
+- **Q4 — “prompt/schema isolation is only partially established.”** Adapter identity freezes one-turn, tool-free, ignore-rules invocation and config. Each attempt obtains a fresh instance; A/B are always exact map-specific base prompt hashes; C derives only from the strict accepted incumbent, and invalid/non-improving calls do not replace it.
+- **Q5 — “bootstrap/sign-flip core is plausible, but only a trivial fixture is tested.”** Added independent pinned index-vector fixtures plus all-zero, all-negative, mixed-sign and tied sign-flip goldens; documented the deterministic percentile convention.
+
+Evidence: full suite `22 tests, OK`; committed rehearsal `90` attempts (`A=10, B=40, C=40`), `$0`, chain verified, ledger SHA-256 `42d983c8dbfc594331dbac4f0295d3e02cb4910e131d3bcd96ef4fa96e9c85d3`.
+
+**Forge explicitly requests Compass re-audit of the v2 preflight correction. LIVE CALLS REMAIN UNAUTHORIZED.**
