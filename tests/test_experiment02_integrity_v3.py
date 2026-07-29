@@ -1,4 +1,5 @@
 import json,re,shutil,subprocess,tempfile,unittest
+from unittest import mock
 from pathlib import Path
 from hillclimber.experiment02 import Completion
 from hillclimber.experiment02_runtime import HashChainLedger,HermesAdapter,Orchestrator,OutagePause,ProtocolAbort,RehearsalAdapter,TransportFailure,preflight,verify_finalized
@@ -34,6 +35,40 @@ class IntegrityV3(unittest.TestCase):
    self.assertEqual((2,2),(rows[-2]['block'],rows[-2]['call_index']))
    self.assertEqual(3,len({r['idempotency_key'] for r in rows if r.get('event')=='attempt_reserved'}))
    with self.assertRaises(ProtocolAbort): Orchestrator(ROOT,COMMIT,p,RehearsalAdapter(values())).run(resume_outage=True)
+ def test_recovered_second_transport_pauses_before_dispatch(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d)/'ledger'
+   Orchestrator(ROOT,COMMIT,p,RehearsalAdapter([TransportFailure('one')])).run(stop_after=1)
+   with self.assertRaises(SystemExit): Orchestrator(ROOT,COMMIT,p,RehearsalAdapter(values())).run(crash_after_dispatch=True)
+   probe=RehearsalAdapter(values())
+   with self.assertRaises(OutagePause): Orchestrator(ROOT,COMMIT,p,probe)
+   rows=HashChainLedger(p).records
+   self.assertEqual(0,len(probe.prompts));self.assertEqual(1,len([r for r in rows if r.get('event')=='outage_paused']))
+   pause=rows[-1];self.assertEqual((2,2),(pause['next_block'],pause['next_call_index']))
+   resumed=RehearsalAdapter(values());Orchestrator(ROOT,COMMIT,p,resumed).run(stop_after=1,resume_outage=True)
+   rows=HashChainLedger(p).records
+   self.assertEqual((2,2),(rows[-2]['block'],rows[-2]['call_index']))
+   self.assertEqual(3,len([r for r in rows if r.get('event')=='attempt_reserved']))
+ def test_source_digest_domain_is_noncircular_and_runtime_sensitive(self):
+  from hillclimber.experiment02_runtime import SOURCE_DIGEST_DOMAIN,source_binding_payload,source_tree_digest
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);(root/'hillclimber').mkdir();(root/'experiment-02').mkdir()
+   (root/'hillclimber/runtime.py').write_text('safe\n');(root/'team-log.md').write_text('dialogue\n')
+   binding=root/'experiment-02/compass-audited-source-binding-v3.json';binding.write_text('{}')
+   subprocess.run(['git','init','-q'],cwd=root,check=True);subprocess.run(['git','add','.'],cwd=root,check=True)
+   generated=source_binding_payload(root)
+   self.assertEqual(SOURCE_DIGEST_DOMAIN,generated['source_digest_domain']);self.assertEqual(source_tree_digest(root),generated['source_tree_sha256'])
+   before=generated['source_tree_sha256'];binding.write_text('{"signature":"independent"}');self.assertEqual(before,source_tree_digest(root))
+   (root/'team-log.md').write_text('new audit dialogue');self.assertEqual(before,source_tree_digest(root))
+   (root/'hillclimber/runtime.py').write_text('mutated\n');self.assertNotEqual(before,source_tree_digest(root))
+ def test_live_cli_is_explicit_and_preflight_only_dispatches_zero(self):
+  import hillclimber.experiment02_live_cli as cli
+  with self.assertRaisesRegex(ProtocolAbort,'explicit --live'): cli.main([])
+  with tempfile.TemporaryDirectory() as d:
+   att=Path(d)/'att.json';att.write_text(json.dumps({k:True for k in ('no_metered_or_extra_usage_fallback','no_prior_experiment_02_live_calls','no_solver_inspection_or_unseal','operator_attested')}))
+   ledger=Path(d)/'new-ledger.jsonl'
+   with mock.patch.object(cli,'ATTESTATION',att),mock.patch.object(cli,'LEDGER',ledger),mock.patch.object(cli,'preflight') as pf,mock.patch.object(cli.HermesAdapter,'complete',side_effect=AssertionError('dispatch')):
+    self.assertEqual(0,cli.main(['--live','--preflight-only']));pf.assert_called_once()
  def test_live_script_is_structurally_barred(self):
   with self.assertRaisesRegex(ProtocolAbort,'scripted') : preflight(ROOT,COMMIT,RehearsalAdapter([]),live=True)
  def test_every_commitment_field_required_and_exact(self):

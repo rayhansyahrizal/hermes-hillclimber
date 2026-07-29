@@ -8,6 +8,13 @@ from hillclimber.experiment02 import BASE_PROMPT, Completion, INVALID_SCORE, MOD
 from hillclimber.judge import InvalidRoute, parse_map, score_route
 
 MAX_CALLS=90; EXPECTED_CALLS={"A":1,"B":4,"C":4}; GENESIS="0"*64
+SOURCE_DIGEST_DOMAIN={
+    "version":"experiment-02-runtime-source-v1",
+    "include":"all git-tracked regular files",
+    "exclude_exact":["team-log.md","experiment-02/compass-audited-source-binding-v3.json"],
+    "exclude_prefix":["experiment-02/evidence/","runs/"],
+    "record_encoding":"UTF-8 path + NUL + lowercase SHA-256(file bytes) + LF, sorted by path; SHA-256 of concatenation",
+}
 class ProtocolAbort(RuntimeError): pass
 class OutagePause(RuntimeError): pass
 class TransportFailure(RuntimeError): pass
@@ -100,9 +107,13 @@ def _git(root,*args): return subprocess.run(["git",*args],cwd=root,capture_outpu
 def source_tree_digest(root):
     files=_git(root,"ls-files").splitlines(); h=hashlib.sha256()
     for name in sorted(files):
-        if name.startswith("runs/live/"): continue
+        if name in SOURCE_DIGEST_DOMAIN["exclude_exact"] or any(name.startswith(p) for p in SOURCE_DIGEST_DOMAIN["exclude_prefix"]): continue
         data=(root/name).read_bytes(); h.update(name.encode()+b"\0"+sha256(data).encode()+b"\n")
     return h.hexdigest()
+
+def source_binding_payload(root):
+    """Single generator used by auditors and runtime verification (signature added independently)."""
+    return {"source_digest_domain":SOURCE_DIGEST_DOMAIN,"source_tree_sha256":source_tree_digest(root)}
 
 def preflight(root,commitment_path,adapter,*,live):
     c=json.loads(commitment_path.read_text())
@@ -125,7 +136,8 @@ def preflight(root,commitment_path,adapter,*,live):
         binding=root/c["source_binding_path"]
         if not binding.exists(): raise ProtocolAbort("independent source/custody acknowledgment absent")
         b=json.loads(binding.read_text()); ident=adapter.introspect()
-        if b.get("source_tree_sha256")!=source_tree_digest(root) or b.get("adapter_identity")!=json.loads(json.dumps(ident.__dict__)): raise ProtocolAbort("audited source/adapter binding mismatch")
+        expected=source_binding_payload(root)
+        if b.get("source_digest_domain")!=expected["source_digest_domain"] or b.get("source_tree_sha256")!=expected["source_tree_sha256"] or b.get("adapter_identity")!=json.loads(json.dumps(ident.__dict__)): raise ProtocolAbort("audited source/adapter binding mismatch")
         if not b.get("compass_signature"): raise ProtocolAbort("Compass signature absent")
         provider=b.get("provider_attestation",{})
         if not provider.get("chatgpt_subscription_oauth") or not provider.get("no_metered_or_extra_usage_fallback") or not provider.get("operator_attested"):
@@ -139,10 +151,29 @@ class Orchestrator:
     def __init__(self,root,commitment,ledger,adapter,*,mode="rehearsal",clock=lambda:"rehearsal"):
         self.root=root; self.adapter=adapter; self.live=mode=="live"; self.manifest,self.commitment=preflight(root,commitment,adapter,live=self.live); self.ledger=HashChainLedger(ledger); self.clock=clock
         if self.live and adapter.rehearsal: raise ProtocolAbort("rehearsal adapter barred from live")
-        self._recover(); self._validate()
+        self._recover(); self._enforce_recovered_outage(); self._validate()
     def _recover(self):
         for r in unresolved(self.ledger.records):
             self.ledger.append({"event":"attempt_result","attempt_id":r["attempt_id"],"status":"ambiguous_transport","analysis_score":INVALID_SCORE,"valid":False,"accepted":False,"error":"reserved without result on resume; consumed and never redispatched","finished_at":self.clock(),"cost":None})
+    def _transport_streak(self):
+        streak=0
+        for r in self.ledger.records:
+            if r.get("event")=="attempt_result":
+                if r.get("status") in {"completed","invalid"}: streak=0
+                elif r.get("status") in {"transport_failure","ambiguous_transport"}: streak+=1
+        return streak
+    def _next_cursor(self):
+        consumed={(r["block"],r["call_index"]) for r in self.ledger.records if r.get("event")=="attempt_reserved"}
+        for b in self.manifest["schedule"]:
+            for i in range(1,EXPECTED_CALLS[b["condition"]]+1):
+                if (b["block"],i) not in consumed: return b["block"],i
+        return None
+    def _enforce_recovered_outage(self):
+        if self._transport_streak()<2 or any(r.get("event")=="outage_paused" for r in self.ledger.records): return
+        cursor=self._next_cursor()
+        if cursor:
+            self.ledger.append({"event":"outage_paused","consecutive_transport_failures":self._transport_streak(),"next_block":cursor[0],"next_call_index":cursor[1],"paused_at":self.clock()})
+            raise OutagePause(f"provider outage recovered; frozen before block {cursor[0]} call {cursor[1]}")
     def _validate(self):
         reservations=[r for r in self.ledger.records if r.get("event")=="attempt_reserved"]
         if len(reservations)>MAX_CALLS: raise ProtocolAbort("call cap exceeded")

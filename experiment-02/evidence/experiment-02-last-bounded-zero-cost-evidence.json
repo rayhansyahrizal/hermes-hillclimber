@@ -1,0 +1,34 @@
+{
+  "protocol": "experiment-02-v3-last-bounded-repair",
+  "live_model_calls": 0,
+  "full_suite": "26 tests, OK",
+  "recovered_outage": {
+    "probe_dispatches": 0,
+    "pause_events": 1,
+    "frozen_cursor": [
+      2,
+      2
+    ],
+    "statuses": [
+      "transport_failure",
+      "ambiguous_transport"
+    ]
+  },
+  "source_binding_generation": {
+    "source_digest_domain": {
+      "version": "experiment-02-runtime-source-v1",
+      "include": "all git-tracked regular files",
+      "exclude_exact": [
+        "team-log.md",
+        "experiment-02/compass-audited-source-binding-v3.json"
+      ],
+      "exclude_prefix": [
+        "experiment-02/evidence/",
+        "runs/"
+      ],
+      "record_encoding": "UTF-8 path + NUL + lowercase SHA-256(file bytes) + LF, sorted by path; SHA-256 of concatenation"
+    },
+    "source_tree_sha256": "7dba49d12b11d557f413eb447311c07a8a16b261cf2c9508e4839606b6111a35"
+  },
+  "cli_preflight_only_tested": true
+}

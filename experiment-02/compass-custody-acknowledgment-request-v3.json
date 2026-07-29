@@ -9,6 +9,28 @@
     "acknowledgment_must_be_independently_signed": true,
     "same_user_limitation": "chmod 0600 is not adversarial separation from another process running as the same OS user; live authorization therefore requires transfer to independently controlled credentials/storage. Runtime has no solver-loading code."
   },
+  "source_digest_binding_schema": {
+    "version": "experiment-02-runtime-source-v1",
+    "include": "all git-tracked regular files",
+    "exclude_exact": [
+      "team-log.md",
+      "experiment-02/compass-audited-source-binding-v3.json"
+    ],
+    "exclude_prefix": [
+      "experiment-02/evidence/",
+      "runs/"
+    ],
+    "record_encoding": "UTF-8 path + NUL + lowercase SHA-256(file bytes) + LF, sorted by path; SHA-256 of concatenation",
+    "required_binding_fields": [
+      "source_digest_domain",
+      "source_tree_sha256",
+      "adapter_identity",
+      "provider_attestation",
+      "local_call_cap",
+      "compass_signature"
+    ],
+    "noncircularity": "The independently generated binding artifact is excluded from its own source digest. Generation and runtime verification call the same source_binding_payload implementation."
+  },
   "provider_binding_requirements": {
     "route": "ChatGPT subscription OAuth via openai-codex",
     "operator_attestation_required": "No metered or extra-usage fallback is enabled immediately before execution.",
