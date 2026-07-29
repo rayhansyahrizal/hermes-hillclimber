@@ -1,0 +1,60 @@
+{
+  "protocol": "experiment-02-v3-execution-integrity",
+  "source_digest_domain": {
+    "version": "experiment-02-runtime-source-v1",
+    "include": "all git-tracked regular files",
+    "exclude_exact": [
+      "team-log.md",
+      "experiment-02/compass-audited-source-binding-v3.json"
+    ],
+    "exclude_prefix": [
+      "experiment-02/evidence/",
+      "runs/"
+    ],
+    "record_encoding": "UTF-8 path + NUL + lowercase SHA-256(file bytes) + LF, sorted by path; SHA-256 of concatenation"
+  },
+  "source_tree_sha256": "7dba49d12b11d557f413eb447311c07a8a16b261cf2c9508e4839606b6111a35",
+  "adapter_identity": {
+    "executable": "/Users/rayhansyahrizal/.hermes/hermes-agent/venv/bin/hermes",
+    "executable_sha256": "e741dd2432ca7450d9b53996808f24f69d433cfde9531012db8569370f8e5d68",
+    "provider": "openai-codex",
+    "model": "gpt-5.6-sol",
+    "hermes_version": "Hermes Agent v0.17.0 (2026.6.19) · upstream fcdefb41\nProject: /Users/rayhansyahrizal/.hermes/hermes-agent\nPython: 3.11.15\nOpenAI SDK: 2.24.0",
+    "config_sha256": "cda55a5a0979a23c7810c5030000ad693cbaa1ad84590064f46d5f6678fd3e8b",
+    "invocation": [
+      "hermes", "chat", "--quiet", "--ignore-rules", "--max-turns", "1", "--source", "tool", "--provider", "openai-codex", "--model", "gpt-5.6-sol"
+    ],
+    "fresh_one_turn": true,
+    "tools_enabled": false,
+    "personal_rules": true
+  },
+  "provider_attestation": {
+    "route": "ChatGPT subscription OAuth via openai-codex at https://chatgpt.com/backend-api/codex",
+    "chatgpt_subscription_oauth": true,
+    "no_metered_or_extra_usage_fallback": true,
+    "operator_attested": true,
+    "limitation": "The operator must immediately re-attest that no metered or extra-usage fallback is enabled before execution. No credentials are recorded here."
+  },
+  "custody_metadata": {
+    "request_path": "experiment-02/compass-custody-acknowledgment-request-v3.json",
+    "request_sha256": "985692fb775f4eee215feab50fb1f8d88abeecfcff491054a8450f4b53e51b17",
+    "solver_artifact_path": "private/experiment-02-solver-manifest.json",
+    "solver_artifact_plaintext_sha256": "ac397ccedb92da44a43a72533dbe88a2180f122b67add287da4895a6a2d7f311",
+    "metadata_only": true,
+    "solver_contents_or_routes_inspected_by_compass": false
+  },
+  "local_call_cap": 90,
+  "limitations": [
+    "The committed solver hash and metadata do not establish adversarial separation from another process under the same OS user; independent credentials/storage remain required.",
+    "Hermes v0.17.0 exposes no supported idempotency-key option; consumed attempts are protected by the fsynced ledger and are never replaced.",
+    "Provider routing and absence of fallback require immediate operator confirmation because they cannot be proven solely by repository state."
+  ],
+  "immediate_operator_attestations_required": [
+    "No metered or extra-usage fallback is enabled.",
+    "No prior Experiment 02 live model calls have occurred.",
+    "No solver artifact, contents, or routes have been inspected or unsealed.",
+    "The fixed live ledger is absent or empty for the initial run; outage resume uses the existing frozen ledger only.",
+    "Executable, config, argv, provider/model route, source digest, and frozen scientific-material hashes remain exactly bound."
+  ],
+  "compass_signature": "Compass terminal audit acceptance of Forge b80276b0834ea248100c6b55796bba552354857d; independently measured and zero-call preflight gated; 2026-07-29"
+}
