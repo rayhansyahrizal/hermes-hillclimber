@@ -1,0 +1,58 @@
+{
+  "audit": "Compass terminal Experiment 02 audit",
+  "decision": "ACCEPT",
+  "authorization": "LIVE_CALLS_AUTHORIZED_ONLY_AFTER_IMMEDIATE_OPERATOR_ATTESTATIONS",
+  "forge_commit": "b80276b0834ea248100c6b55796bba552354857d",
+  "binding_commit": "7286f57",
+  "live_model_calls_by_compass": 0,
+  "independent_results": {
+    "full_suite": "26 tests, OK",
+    "targeted_suite": "3 tests, OK",
+    "recovered_transport_injection": {
+      "statuses": ["transport_failure", "ambiguous_transport"],
+      "probe_dispatches_before_pause": 0,
+      "outage_paused_events": 1,
+      "frozen_cursor": [2, 2],
+      "explicit_resume_events": 1,
+      "replacement_calls": 0
+    },
+    "source_binding": {
+      "domain_noncircular": true,
+      "generation_verifier_shared_payload": true,
+      "exact_source_tree_sha256": "7dba49d12b11d557f413eb447311c07a8a16b261cf2c9508e4839606b6111a35",
+      "binding_and_log_mutation_insensitive": true,
+      "runtime_mutation_sensitive": true
+    },
+    "hermes": {
+      "version": "Hermes Agent v0.17.0 (2026.6.19) upstream fcdefb41",
+      "executable_sha256": "e741dd2432ca7450d9b53996808f24f69d433cfde9531012db8569370f8e5d68",
+      "config_sha256": "cda55a5a0979a23c7810c5030000ad693cbaa1ad84590064f46d5f6678fd3e8b",
+      "provider": "openai-codex",
+      "model": "gpt-5.6-sol",
+      "route": "https://chatgpt.com/backend-api/codex",
+      "argv": ["hermes", "chat", "--quiet", "--ignore-rules", "--max-turns", "1", "--source", "tool", "--provider", "openai-codex", "--model", "gpt-5.6-sol"],
+      "credentials_recorded": false
+    },
+    "cli": {
+      "no_live_flag_rejected": true,
+      "resume_without_live_rejected": true,
+      "nonempty_initial_ledger_rejected": true,
+      "resume_without_active_pause_rejected": true,
+      "fixed_paths_verified": true,
+      "live_preflight_only_exit": 0,
+      "preflight_model_calls": 0,
+      "live_ledger_after_preflight": false
+    },
+    "scientific_materials": {
+      "maps_prompts_scoring_schedule_analysis_preregistration_amendment_unchanged": true
+    },
+    "custody": {
+      "request_sha256": "985692fb775f4eee215feab50fb1f8d88abeecfcff491054a8450f4b53e51b17",
+      "solver_plaintext_sha256_metadata_only": "ac397ccedb92da44a43a72533dbe88a2180f122b67add287da4895a6a2d7f311",
+      "solver_contents_or_routes_inspected": false,
+      "limitation": "Same-user metadata and mode are not adversarial custody; independent credentials/storage remain required."
+    }
+  },
+  "binding_path": "experiment-02/compass-audited-source-binding-v3.json",
+  "immediate_operator_attestations_remain_required": true
+}
