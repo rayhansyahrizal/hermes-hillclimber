@@ -76,9 +76,13 @@ class HermesAdapter:
         version=subprocess.run([str(self.executable),"--version"],capture_output=True,text=True,check=True).stdout.strip()
         args=list(self.invocation); provider=args[args.index("--provider")+1]; model=args[args.index("--model")+1]
         return RuntimeIdentity(str(self.executable),sha256(self.executable.read_bytes()),provider,model,version,sha256(self.config.read_bytes()),self.invocation,"--max-turns" in args and args[args.index("--max-turns")+1]=="1",False,"--ignore-rules" in args)
+    def build_argv(self):
+        """Return the exact audited argv. Idempotency is deliberately ledger-only."""
+        return [str(self.executable),*self.invocation[1:]]
     def complete(self,prompt,idempotency_key):
-        # stdin only; executable and full argv are the inspected values above.
-        p=subprocess.run([str(self.executable),*self.invocation[1:],"--idempotency-key",idempotency_key],input=prompt,capture_output=True,text=True,check=True)
+        # Hermes 0.17.0 has no idempotency-key option; the durable key remains
+        # in the fsynced reservation and is never passed as unsupported argv.
+        p=subprocess.run(self.build_argv(),input=prompt,capture_output=True,text=True,check=True)
         return Completion(p.stdout)
 
 class RehearsalAdapter:
@@ -123,7 +127,10 @@ def preflight(root,commitment_path,adapter,*,live):
         b=json.loads(binding.read_text()); ident=adapter.introspect()
         if b.get("source_tree_sha256")!=source_tree_digest(root) or b.get("adapter_identity")!=json.loads(json.dumps(ident.__dict__)): raise ProtocolAbort("audited source/adapter binding mismatch")
         if not b.get("compass_signature"): raise ProtocolAbort("Compass signature absent")
-        if not b.get("provider_enforcement",{}).get("currency_cap_verified") or not b.get("provider_enforcement",{}).get("call_cap_verified"): raise ProtocolAbort("provider/account dollar and call enforcement unverifiable")
+        provider=b.get("provider_attestation",{})
+        if not provider.get("chatgpt_subscription_oauth") or not provider.get("no_metered_or_extra_usage_fallback") or not provider.get("operator_attested"):
+            raise ProtocolAbort("subscription routing/operator attestation absent")
+        if b.get("local_call_cap")!=MAX_CALLS: raise ProtocolAbort("durable local call cap not bound")
         dirty=[x for x in _git(root,"status","--porcelain").splitlines() if x and " runs/live/" not in x]
         if dirty: raise ProtocolAbort("source tree not clean")
     return manifest,c
@@ -140,12 +147,27 @@ class Orchestrator:
         reservations=[r for r in self.ledger.records if r.get("event")=="attempt_reserved"]
         if len(reservations)>MAX_CALLS: raise ProtocolAbort("call cap exceeded")
         if sum(r["reserved_usd"] for r in reservations)>10: raise ProtocolAbort("reserved spend cap exceeded")
-    def run(self,stop_after=None,crash_after_dispatch=False):
+    def run(self,stop_after=None,crash_after_dispatch=False,*,resume_outage=False):
         if self.ledger.records and self.ledger.records[-1].get("event")=="ledger_finalized": raise ProtocolAbort("ledger finalized")
+        pauses=[r for r in self.ledger.records if r.get("event")=="outage_paused"]
+        resumes=[r for r in self.ledger.records if r.get("event")=="outage_resumed"]
+        active=bool(pauses) and not any(r.get("pause_entry_sha256")==pauses[-1]["entry_sha256"] for r in resumes)
+        if active:
+            if not resume_outage: raise OutagePause("explicit outage resume required")
+            if resumes: raise ProtocolAbort("outage resume already consumed")
+            pause=pauses[-1]
+            self.ledger.append({"event":"outage_resumed","pause_entry_sha256":pause["entry_sha256"],"next_block":pause["next_block"],"next_call_index":pause["next_call_index"],"resumed_at":self.clock()})
+        elif resume_outage: raise ProtocolAbort("no frozen outage to resume")
         attempted=0
         results={r["attempt_id"]:r for r in self.ledger.records if r.get("event")=="attempt_result"}
         slots=[(b,i) for b in self.manifest["schedule"] for i in range(1,EXPECTED_CALLS[b["condition"]]+1)]
         consumed={(r["block"],r["call_index"]) for r in self.ledger.records if r.get("event")=="attempt_reserved"}
+        # Protocol reset occurs only after a completed or model-invalid response.
+        consecutive_transport=0
+        for r in self.ledger.records:
+            if r.get("event")=="attempt_result":
+                if r.get("status") in {"completed","invalid"}: consecutive_transport=0
+                elif r.get("status") in {"transport_failure","ambiguous_transport"}: consecutive_transport+=1
         incumbents={}
         for res in results.values():
             if res.get("accepted"): incumbents[res["block"]]=res
@@ -173,12 +195,20 @@ class Orchestrator:
                 score=judged.score if judged else INVALID_SCORE; accepted=judged is not None and (incumbent is None or score>incumbent["analysis_score"])
                 rec={"event":"attempt_result","attempt_id":aid,"status":"completed" if judged else "invalid","raw_output":completion.text,"parsed_route":route,"analysis_score":score,"valid":judged is not None,"accepted":accepted,"error":error,"steps":judged.steps if judged else None,"treasures_collected":judged.treasures_collected if judged else None,"exit_reached":judged.reached_exit if judged else None,"collision":judged.collided if judged else None,"finished_at":self.clock(),**{k:getattr(completion,k) for k in ("input_tokens","cached_input_tokens","output_tokens","reasoning_tokens","total_tokens","cost")},**{k:reservation[k] for k in ("block","map_id","condition","call_index","prompt_sha256")}}
                 saved=self.ledger.append(rec)
+                consecutive_transport=0
                 if accepted: incumbents[block["block"]]=saved
             except (TransportFailure,TimeoutError,ConnectionError) as e:
                 self.ledger.append({"event":"attempt_result","attempt_id":aid,"status":"transport_failure","analysis_score":INVALID_SCORE,"valid":False,"accepted":False,"error":f"{type(e).__name__}: {e}","finished_at":self.clock(),"cost":None,**{k:reservation[k] for k in ("block","map_id","condition","call_index","prompt_sha256")}})
+                consecutive_transport+=1
             except SystemExit: raise
             except BaseException as e:
                 self.ledger.append({"event":"protocol_abort","attempt_id":aid,"error":f"{type(e).__name__}: {e}","finished_at":self.clock()}); raise
             consumed.add((block["block"],index)); attempted+=1
+            if consecutive_transport>=2:
+                remaining=[(b,i) for b,i in slots if (b["block"],i) not in consumed]
+                if remaining:
+                    nxt,nidx=remaining[0]
+                    self.ledger.append({"event":"outage_paused","consecutive_transport_failures":consecutive_transport,"next_block":nxt["block"],"next_call_index":nidx,"paused_at":self.clock()})
+                    raise OutagePause(f"provider outage; frozen before block {nxt['block']} call {nidx}")
             if stop_after and attempted>=stop_after:return
         self.ledger.finalize()

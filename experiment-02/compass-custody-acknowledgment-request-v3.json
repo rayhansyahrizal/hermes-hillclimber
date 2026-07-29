@@ -1,6 +1,6 @@
 {
   "protocol": "experiment-02-v3-execution-integrity",
-  "request": "Compass: independently verify the committed source-tree digest, adapter identity, custody separation, provider-side caps, and sign the separate binding file. Forge has not signed for Compass.",
+  "request": "Compass: independently verify the source-tree digest, supported Hermes argv and adapter identity, custody controls, operator subscription attestation, and durable local 90-call cap, then sign the separate binding file. Forge has not signed for Compass.",
   "solver_artifact_path": "private/experiment-02-solver-manifest.json",
   "solver_artifact_sha256": "ac397ccedb92da44a43a72533dbe88a2180f122b67add287da4895a6a2d7f311",
   "custody_protocol": {
@@ -8,6 +8,12 @@
     "unseal_requires_verified_finalized_ledger": true,
     "acknowledgment_must_be_independently_signed": true,
     "same_user_limitation": "chmod 0600 is not adversarial separation from another process running as the same OS user; live authorization therefore requires transfer to independently controlled credentials/storage. Runtime has no solver-loading code."
+  },
+  "provider_binding_requirements": {
+    "route": "ChatGPT subscription OAuth via openai-codex",
+    "operator_attestation_required": "No metered or extra-usage fallback is enabled immediately before execution.",
+    "durable_local_call_cap": 90,
+    "provider_side_currency_or_call_boolean_required": false
   },
   "status": "REQUESTED_NOT_ACKNOWLEDGED"
 }

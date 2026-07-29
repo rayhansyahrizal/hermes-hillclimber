@@ -23,6 +23,6 @@
     "max_reserved_usd_per_call": 0.11
   },
   "custody_request_path": "experiment-02/compass-custody-acknowledgment-request-v3.json",
-  "custody_request_sha256": "405c94aeb4deff1a39e4e7fcb0c395bae990eb26f3a5ebf44fdbb252bc956e79",
+  "custody_request_sha256": "9c4c9be87241a6b2bcae751fbaa6f9dbec3b2a843a89209269dd6194db7641af",
   "source_binding_path": "experiment-02/compass-audited-source-binding-v3.json"
 }

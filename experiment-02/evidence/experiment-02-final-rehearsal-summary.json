@@ -1,0 +1,26 @@
+{
+  "live_model_calls": 0,
+  "invocation_contract": "tested against resolved hermes chat --help; no dispatch",
+  "full": {
+    "sha256": "1a35620f5cc0b53bcb3eab909927258efd7ab0601b1e254d9121ec8d685a13d1",
+    "events": 181,
+    "reservations": 90,
+    "finalized": true
+  },
+  "crash": {
+    "sha256": "9db7b80e7f150618a43e64b49d6a90b01e3d21fb60c61ad2d86fbe21fa2ebc8e",
+    "events": 4,
+    "crashed_key_redispatched": false
+  },
+  "outage": {
+    "sha256": "ce26333b6e586ef65320a105c6e7486e361488c634b2cbcac707116738c87b1f",
+    "events": 8,
+    "pause_fsynced_before_resume": true,
+    "frozen_next": [
+      2,
+      2
+    ],
+    "resume_events": 1,
+    "consumed_calls_replaced": false
+  }
+}
