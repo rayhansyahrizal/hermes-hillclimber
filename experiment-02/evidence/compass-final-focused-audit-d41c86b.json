@@ -1,0 +1,57 @@
+{
+  "audit": "Compass final focused authorization audit",
+  "decision": "REVISE",
+  "authorization": "NO_LIVE_CALLS_AUTHORIZED",
+  "forge_commit": "d41c86b89c4fca6b858778b866478d915eb8eaa7",
+  "audited_clean_source_tree_sha256": "48d55b5b74bdf7ff3c0518881478f18e3efa9b54a33c564e75129798cd0e6174",
+  "live_model_calls_by_compass": 0,
+  "independent_results": {
+    "tests": "23 tests, OK",
+    "hermes": {
+      "version": "Hermes Agent v0.17.0 (2026.6.19) upstream fcdefb41",
+      "resolved_executable": "/Users/rayhansyahrizal/.hermes/hermes-agent/venv/bin/hermes",
+      "executable_sha256": "e741dd2432ca7450d9b53996808f24f69d433cfde9531012db8569370f8e5d68",
+      "config_sha256": "cda55a5a0979a23c7810c5030000ad693cbaa1ad84590064f46d5f6678fd3e8b",
+      "argv": ["hermes", "chat", "--quiet", "--ignore-rules", "--max-turns", "1", "--source", "tool", "--provider", "openai-codex", "--model", "gpt-5.6-sol"],
+      "unsupported_idempotency_option_absent": true,
+      "ledger_idempotency_present": true,
+      "configured_route": "openai-codex / gpt-5.6-sol / https://chatgpt.com/backend-api/codex"
+    },
+    "rehearsal_hashes": {
+      "full": "1a35620f5cc0b53bcb3eab909927258efd7ab0601b1e254d9121ec8d685a13d1",
+      "crash": "9db7b80e7f150618a43e64b49d6a90b01e3d21fb60c61ad2d86fbe21fa2ebc8e",
+      "outage": "ce26333b6e586ef65320a105c6e7486e361488c634b2cbcac707116738c87b1f",
+      "summary": "4e89ae8902de6e10b039342a8bb9e85a3758fd6d8917336c1faae55cfb36e6d5"
+    },
+    "frozen_materials": {
+      "preregistration_sha256": "37941833ec248aafe2e39aa56627590fa69930a8712ad877ed5b7c4e1e71dcf2",
+      "amendment_sha256": "7f990eeeb8d808381b695aa68c1451c881b88ff394b452bd3754bb48f760a145",
+      "manifest_v2_sha256": "3ca788917d3f9e8ae56afdf7a379bd6fc4b626d52267022f16b642e85bc22cf5",
+      "maps_prompts_scoring_schedule_analysis_unchanged_since_prior_audit": true,
+      "solver_sha256": "ac397ccedb92da44a43a72533dbe88a2180f122b67add287da4895a6a2d7f311",
+      "solver_mode": "0600",
+      "solver_contents_or_routes_inspected": false
+    }
+  },
+  "blocking_findings": [
+    {
+      "id": "OUTAGE-RECOVERY-2",
+      "finding": "Two consecutive transport-class failures that become consecutive during startup recovery do not fsync an outage pause before the next reservation/dispatch.",
+      "fault_injection": "A transport_failure followed by a post-dispatch crash is recovered as ambiguous_transport. On the next run the adapter was dispatched once, no outage_paused event existed, and block 2/call 2 was reserved. Observed statuses were transport_failure, ambiguous_transport, completed.",
+      "required_fix": "After recovery and before any new reservation, reconstruct the consecutive transport count and, when it is at least two, fsync outage_paused with the frozen next cursor and raise OutagePause. Add a targeted regression test."
+    },
+    {
+      "id": "BINDING-SELF-REFERENCE",
+      "finding": "The required binding cannot satisfy live preflight in a clean committed tree because source_tree_digest includes the binding file while the binding must contain that digest.",
+      "required_fix": "Define and enforce a non-self-referential digest domain (for example, explicitly exclude only the binding artifact from both generation and verification), then regenerate and independently bind the resulting exact domain."
+    },
+    {
+      "id": "NO-LIVE-ENTRYPOINT",
+      "finding": "No executable live entrypoint constructs HermesAdapter and Orchestrator in live mode, accepts an explicit one-time outage resume, or supplies the specified commitment and ledger paths.",
+      "required_fix": "Provide a narrow tested CLI/command procedure for initial live execution and explicit resume. Do not authorize direct ad-hoc Python construction as the operational protocol."
+    }
+  ],
+  "provider_schema_assessment": "Proportional subscription-OAuth schema is acceptable: operator attestation of no metered/extra-usage fallback plus durable local 90-call cap; it does not falsely require nonexistent provider-side booleans.",
+  "custody_limitation": "The solver byte commitment and mode establish ordinary same-user masking only, not adversarial same-user separation or independent third-party custody.",
+  "binding_status": "NOT_ISSUED_BECAUSE_BLOCKERS_REMAIN"
+}
