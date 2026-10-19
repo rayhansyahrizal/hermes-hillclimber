@@ -1,5 +1,7 @@
 # Hermes Hillclimber
 
+[![tests](https://github.com/rayhansyahrizal/hermes-hillclimber/actions/workflows/tests.yml/badge.svg)](https://github.com/rayhansyahrizal/hermes-hillclimber/actions/workflows/tests.yml)
+
 An LLM is dropped into a text maze and asked for a route that collects treasure and reaches the exit.
 A deterministic local judge scores every answer and keeps only strictly better ones. The model can
 propose; it cannot touch the map, the rules or the judge.
@@ -47,7 +49,9 @@ The harness went through an adversarial review between two roles, a builder ("Fo
 ("Compass"). The first version was **rejected**, among other findings because its run schedule did not
 match the frozen counterbalancing rule. The rejection was kept, the protocol was amended
 ([v2](experiment-02-protocol-amendment-v2-2026-07-29.md)) before anything was fixed, and the final
-preflight was accepted. The full exchange is in [`team-log.md`](team-log.md).
+preflight was accepted. Why this gate exists and what it caught:
+[decision 0001](docs/decisions/0001-an-independent-audit-gates-every-live-experiment.md). The full
+exchange, unedited: [`team-log.md`](team-log.md).
 
 Zero-cost rehearsals with a scripted model, in [`experiment-02/evidence/`](experiment-02/evidence/):
 
@@ -84,8 +88,10 @@ python3 -m hillclimber.experiment02_cli dry-run experiment-02/experiment-02-mani
   --output runs/experiment-02-dry-run.jsonl
 ```
 
-The Experiment 02 live orchestrator (`hillclimber.experiment02_runtime.Orchestrator`) fails closed unless
-explicitly enabled, and is deliberately not exposed as a CLI command.
+The live Experiment 02 entry point, `python3 -m hillclimber.experiment02_live_cli --live`, fails closed:
+it refuses to run without an explicit `--live`, a complete operator attestation, a signed source binding
+and an empty ledger. The audited source tree is tagged `exp02-audited-source`; a live run must start
+from that tag, because any later commit changes the hash the preflight checks.
 
 ## Layout
 
@@ -97,3 +103,8 @@ explicitly enabled, and is deliberately not exposed as a CLI command.
 | `hillclimber/experiment02*.py` | Preregistered harness, runtime, analysis |
 | `maps/`, `experiment-02/maps/` | Maze files |
 | `experiment-02/evidence/` | Rehearsal ledgers and audit decisions |
+| `docs/decisions/` | Decision records |
+
+## License
+
+[MIT](LICENSE).
